@@ -145,7 +145,7 @@ class Multiplayer {
     public function leaveRoom($roomid, $token, $userid) {
         $api_url = "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/".$roomid."/leave";
         
-        $method_name = "GET";
+        $method_name = "POST";
         
         $api_request_parameters = array(
           'token' => $token,
@@ -154,6 +154,7 @@ class Multiplayer {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        $postFields = http_build_query($api_request_parameters);
         $api_url .= '?' . http_build_query($api_request_parameters);
         /*
           Here you can set the Response Content Type you prefer to get :
@@ -161,6 +162,8 @@ class Multiplayer {
         */
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
         curl_setopt($ch, CURLOPT_URL, $api_url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
         curl_setopt($ch, CURLOPT_HEADER, TRUE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -171,13 +174,16 @@ class Multiplayer {
         $api_response_header = trim(substr($api_response, 0, $api_response_info['header_size']));
         $api_response_body = substr($api_response, $api_response_info['header_size']);
 
-        if (!empty($api_response_body)) {
+        if (empty($api_response_body)) {
             $json = json_decode($api_response_body);
+            
+            /* Multiplayer */
+            //$_SESSION['multiplayer'] = $json->{"roomid"}['0'];
             session_start();
             $_SESSION['multiplayer'] = 0;
             
             /* Redirect */
-            $_SESSION['alert'] = array("success","Du er nu med i spillet");
+            $_SESSION['alert'] = array("success","Du er nu ikke med i spillet længere");
             header( "Location: ../multiplayer.php" );
             header( "HTTP/1.1 301 Moved Permanently" );
         } else {

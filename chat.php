@@ -24,8 +24,8 @@ if($_SESSION['loggedin']){
                 
                 <div class="Chat" style="height: 400px; white-space: nowrap; overflow-y: scroll;">
                     
-                    <div style="position: absolute; bottom: 0;">
-                        <span id="chat">[28-03-2017 | 18:01:08] Thomas Anthony: Wuhu.</span>
+                    <div id="chat-content" style="position: absolute; bottom: 0;">
+                        <span id="chat"></span>
                     </div>
                         
                 </div>
@@ -38,10 +38,10 @@ if($_SESSION['loggedin']){
                 <ul class="nav nav-pills nav-stacked">
                     <li class="dropdown mr-5">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <span id="chatname">Thomas Anthony</span>
+                            <span id="chatonline">Thomas Anthony</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="???????">View Profile</a></li>
+                            <li><a href="#">View Profile</a></li>
                             <li><a href="#">Challenge</a></li>
                             <li class="divider"></li>
                             <li><a href="#">Join Multiplayer</a></li>
@@ -53,7 +53,7 @@ if($_SESSION['loggedin']){
                 <ul class="nav nav-pills nav-stacked">
                     <li class="dropdown mr-5">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <span id="chatname">Søren Fritzbøger</span>
+                            <span id="chatonline">Søren Fritzbøger</span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="#">View Profile</a></li>
@@ -70,63 +70,82 @@ if($_SESSION['loggedin']){
         </div>
             
         <div class="col-lg-9 col-md-9 col-sm-9" style="display: table-cell; vertical-align: bottom;">
-            <textarea class="form-control" rows="2" id="textArea"></textarea>
+            <textarea class="form-control" id="message" rows="2" id="textArea"></textarea>
         </div>
             
         <div class="col-lg-3 col-md-3 col-sm-3">
-            <a href="#" class="btn btn-default btn-lg btn-block">Send</a>
+            <a href="#" id="send" class="btn btn-default btn-lg btn-block">Send</a>
         </div>
             
             
             
     </div>
 </div>
-    
-
 
 <script>
-    listen = function() {
-        $(function() {
+    $(function() {
+        listen = function() {
             $.ajax({
                method: "GET" ,
-               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/chat/listen",
+               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/chat/listen/<?php echo $_SESSION['userid']; ?>",
             }).done(function(msg) {
-                $('#chat').text(msg);
-                console.log(msg.winner);
+                console.log(msg);
+                var html = "<p>Some HTML</p>";
+                var div = document.createElement("div");
+                div.innerHTML = msg;
+                var text = div.textContent || div.innerText || "";
+                $('#chat').append(text);
                 listen();
-                users();
+            }).fail(function(msg) {
+                var html = "<p>Some HTML</p>";
+                var div = document.createElement("div");
+                div.innerHTML = msg.responseText;
+                var text = div.textContent || div.innerText || "";
+                $('#chat').append('<br />' + text);
+                listen();
+            });
+        }
+        listen();
+
+        $('body').on('click', '#send', function() {
+            $.ajax({
+                method: "POST" ,
+                data: {
+                    token: '<?php echo $_SESSION['token']; ?>',
+                    userid: '<?php echo $_SESSION['userid']; ?>',
+                    message: $('#message').val()
+                },
+                url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/chat/send"
+            }).done(function(msg) {
+                console.log(msg);
+                $('#message').val('');
             }).fail(function(msg) {
                 console.log(msg);
-                listen();
-                users();
+                $('#message').val('');
             });
         });
-    }
-    listen();
+    });
 
-    users = function() {
-        $(function() {
-            $.ajax({
-               method: "GET" ,
-               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/chat/users",
-            }).done(function(msg) {
-                $('#online').text(numberofusersinchat);
-                // Dette skal være en liste med personer
-                // Der må også gerne være links? (profile.php?user=$userid)
-                $('#chatname').text(nameofaperson);
+    // won = function() {
+    //     $(function() {
+    //         $.ajax({
+    //            method: "GET" ,
+    //            url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/<?php echo $_SESSION['multiplayer']; ?>/won",
+    //         }).done(function(msg) {
+    //             $('#winners').removeClass("hidden");
+    //             $('#winnername').text(msg.winner);
                 
-                console.log("users");
-            }).fail(function(msg) {
-                console.log("Fail: "+msg);
-            });
-        });
-    }
-    users();
+    //             console.log("nextRound");
+    //         }).fail(function(msg) {
+    //             console.log("Fail: "+msg);
+    //         });
+    //     });
+    // }
+
+    // won();
 
 </script>
-
-
-
+    
 <?php 
 include ("footer.php");
 } else {

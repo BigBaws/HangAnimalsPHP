@@ -314,31 +314,31 @@ if($_SESSION['loggedin']){
 
 <script>
     $(function() {
-        function pull_highscores() {
-            $.ajax({
-               method: "GET" ,
-               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/<?php echo $_SESSION['multiplayer']; ?>/users",
-            }).done(function(msg) {
-                var names = "";
-                var scores = "";
+        // function pull_highscores() {
+        //     $.ajax({
+        //        method: "GET" ,
+        //        url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/<?php echo $_SESSION['multiplayer']; ?>/users?token=<?php echo $_SESSION['token']; ?>",
+        //     }).done(function(msg) {
+        //         var names = "";
+        //         var scores = "";
                 
-                $.each(msg.users, function(userindex, user){
-                    names += user.name + "<br />";
-                    scores += user.gamescore + "<br />";
-                });
+        //         $.each(msg.users, function(userindex, user){
+        //             names += user.name + "<br />";
+        //             scores += user.gamescore + "<br />";
+        //         });
                 
                 
-                $('#participantsname').html(names); 
-                $('#participantsgamescore').html(scores);
-            }).fail(function(msg) {
-                    console.log(msg);
-                });
-        }
+        //         $('#participantsname').html(names); 
+        //         $('#participantsgamescore').html(scores);
+        //     }).fail(function(msg) {
+        //             console.log(msg);
+        //         });
+        // }
         
         window.setInterval(function() {
              $.ajax({
                method: "GET" ,
-               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/<?php echo $_SESSION['multiplayer']; ?>/users",
+               url: "http://ubuntu4.javabog.dk:4176/HangAnimalsREST/webresources/multiplayer/room/<?php echo $_SESSION['multiplayer']; ?>/users?token=<?php echo $_SESSION['token']; ?>",
             }).done(function(msg) {
                 var names = "";
                 var scores = "";
